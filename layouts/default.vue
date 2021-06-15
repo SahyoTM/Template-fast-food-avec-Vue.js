@@ -15,7 +15,7 @@
           ><img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="avatar"></v-avatar>
         </div>
 
-        <div class="text-center text-uppercase title_user">John Doe</div>
+        <div class="text-center text-uppercase title_user">Constantin</div>
       </v-sheet>
 
 
@@ -96,6 +96,13 @@ import * as animationData from "@/assets/animation/food_delivery.json";
         },
       }
     },
+    mounted: function() {
+      this.$nextTick(() => {
+        this.$nuxt.$loading.start()
+
+        setTimeout(() => this.$nuxt.$loading.finish(), 3000)
+      })
+    },
     methods: {
       handleAnimation: function (anim) {
         this.anim = anim;
@@ -141,7 +148,8 @@ import * as animationData from "@/assets/animation/food_delivery.json";
 }
 
 .title_user{
-  color:#F87193;
+  color:#30334F;
+  font-weight: 900;
 }
 
 .v-list-item__content, .v-list-item__icon{

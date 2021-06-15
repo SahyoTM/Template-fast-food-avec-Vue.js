@@ -19,6 +19,8 @@ export default {
   css: [
   ],
 
+  loading:"@/components/Preloading.vue",
+
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
   ],
@@ -29,7 +31,7 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/eslint
-    // '@nuxtjs/eslint-module',
+    //'@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
 
@@ -56,7 +58,7 @@ export default {
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
     'cookie-universal-nuxt',
-    ['cookie-universal-nuxt', { alias: 'cookiz' }],
+    'cookie-universal-nuxt',
     [
       '@nuxtjs/firebase',
       {
@@ -115,5 +117,9 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+  },
+
+  env: {
+    maxAge: 60 * 5,
   }
 }

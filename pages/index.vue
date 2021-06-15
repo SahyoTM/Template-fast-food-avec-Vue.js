@@ -3,42 +3,100 @@
     <LikeBar />
     <br>
     <div class="container">
-      <h1 class="title_articles">ALL</h1>
-      <input type="text" v-model="search" placeholder="🔎 Recherchez le plat que vous souhaitez">
+      <v-row>
+        <div class="choose-container col-10">
+          <v-radio-group v-model="categorieChoose" row>
+            <div v-for="categorie in categories" :key="categorie" class="categorie-container">
+              <v-radio type="radio" name="radio" v-bind:id="categorie.name" v-bind:value="categorie.name"></v-radio>
+              <label v-bind:for="categorie.name" :value="categorie.name" class="label_categorie">
+                <img height="64px" :src="require(`@/assets/categorie/${categorie.name}.png`)" style="" />
+                <!-- <p>{{categorie.name}}</p> -->
+              </label>
+            </div>
+          </v-radio-group>
+        </div>
+        <div class="promo-container col-2">
+          <v-card class="mx-auto" max-width="344" outlined>
+            <v-list-item three-line>
+
+
+              <img src="@/assets/promo.png" height="128px" alt="" class="mx-auto">
+            </v-list-item>
+
+            <v-card-actions class=" font-weight-bold" style="color:#30334F;">
+                - 50% sur tous nos burgers !
+            </v-card-actions>
+          </v-card>
+          
+        </div>
+      </v-row>
+      <h1 class="title_articles text-uppercase">{{ categorieChoose || 'null' }} <span
+          v-if="filteredPlats.length >= 1 && categorieChoose !='all'"
+          style="color:#30334F;font-size:1.5rem;font-weight:400;" class="text-uppercase">
+          {{filteredPlats.length}} Résultat<span v-if="filteredPlats.length >= 2">s</span></span></h1>
+      <!-- <input type="text" v-model="search" placeholder="🔎 Recherchez le plat que vous souhaitez">
       <span v-if="search && filteredPlats.length >= 1" style="color:#30334F;font-size:1.5rem;font-weight:700;" class="text-uppercase">
         {{filteredPlats.length}} Résultat<span v-if="filteredPlats.length >= 2">s</span>
-      </span>
+      </span> -->
       <v-row no-gutters>
-        <v-col v-for="plat in filteredPlats" :key="plat.post_name" cols="6" md="4" max-height="300px">
-          <v-scroll-x-transition appear>
-            <v-card class="mx-auto" max-width="400">
-              <v-img class="white--text align-end" max-height="200px" :src="`${plat.acf.image.sizes.medium}`">
-                <v-card-title>{{plat.post_title}} - {{plat.acf.prix}} €</v-card-title>
-              </v-img>
+        <div class="menu-container col-md-10">
+          <v-row>
+            <v-col v-for="plat in filteredPlats" :key="plat.post_name" col="6" md="4" max-height="300px">
+              <v-scroll-x-transition appear>
+                <v-card class="mx-auto" max-width="300px">
+                  <v-img class="white--text align-end" height="150px" :src="`${plat.acf.image.sizes.medium}`">
+                    <v-card-title>{{plat.post_title}} - {{plat.acf.prix}} €</v-card-title>
+                  </v-img>
 
-              <v-card-text class="text--primary">
-                <div class="card-icons">
-                  <div class="like-container">
-                    <input type="checkbox" name="checkbox" v-bind:id="plat.ID">
-                    <label v-bind:for="plat.ID" :value="plat.ID" v-model="liked" @click="setLikeCookie()">
-                      <v-icon>fa-heart</v-icon>
-                    </label>
-                  </div>
-                  <div class="add-to-cart">
-                    <button>
-                      <v-icon>fa-shopping-cart</v-icon>
-                    </button>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-scroll-x-transition>
-        </v-col>
+                  <v-card-text class="text--primary">
+                    <div class="card-icons">
+                      <div class="like-container">
+                        <input type="checkbox" name="checkbox" v-bind:id="plat.ID">
+                        <label v-bind:for="plat.ID" :value="plat.ID" v-model="liked" @click="setLikeCookie()">
+                          <v-icon>fa-heart</v-icon>
+                        </label>
+                      </div>
+                      <div class="add-to-cart">
+                        <button>
+                          <v-icon>fa-shopping-cart</v-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-scroll-x-transition>
+            </v-col>
+          </v-row>
+        </div>
+        <div class="feed-container col-md-2">
+          <div class="contact-container">
+            <div class="contact-container-title">
+              <h1 class="text-uppercase" style="color:#30334F;">Contact</h1>
+            </div>
+            <p class="">
+              <v-icon>fa-phone</v-icon>065645464
+            </p>
+            <p class="">
+              <v-icon>fa-envelope-open</v-icon>test@€st.com
+            </p>
+            <p class="">
+              <v-icon>fa-home</v-icon>adresse
+            </p>
+            <a href="">
+              <v-icon>fab fa-facebook</v-icon>
+            </a>
+            <a href="">
+              <v-icon>fab fa-instagram</v-icon>
+            </a>
+          </div>
+        </div>
       </v-row>
 
-      <!-- <div v-if="filteredPlats.length == []">
+      <!-- 
+      <div v-if="filteredPlats.length == []">
         <p>Désolé</p>
-      </div> -->
+      </div> 
+-->
     </div>
   </v-app>
 </template>
@@ -48,43 +106,88 @@ import lottie from "vue-lottie/src/lottie.vue";
 import * as animationData from "@/assets/animation/choose_food.json";
 import axios from 'axios';
 
-  export default {
-    data(){
+export default {
+  data() {
     return {
       anim: null, // for saving the reference to the animation
       lottieOptions: {
         animationData: animationData.default
       },
+      isActive: true,
       plats: [],
-      search:'',
-      liked:[],
+      search: '',
+      liked: [],
+      categorieChoose:'all',
+      categories: [{
+            icon: 'fa-home',
+            name: 'all',
+            id:'1'
+          },
+          {
+            icon: 'fa-hamburger',
+            name: 'burger',
+            id:'2'
+          },
+          {
+            icon: 'fa-pizza-slice',
+            name: 'pizza',
+            id:'3'
+          },
+          {
+            icon: 'fa-pizza-slice',
+            name: 'tacos',
+            id:'4'
+          }
+        ],
     }
   },
-  mounted(){
-    axios.get("https://api-template.theo-meyer.com/wp-json/wp/v2/plat").then(response => 
-    this.plats = response.data);
-    console.log(this.recettes);
-  },
-
   computed: {
     filteredPlats() {
-      //this.$nuxt.$on('searchEvent', () => {
+      if(this.categorieChoose != 'all'){
+      return this.plats.filter(plat => {
+        return plat.acf.categorie.indexOf(this.categorieChoose) > -1
+      })
+      }
+      else {
         return this.plats.filter(plat => {
-          return plat.post_name.indexOf(this.search.toLowerCase()) > -1
-          console.log(search)
-        })
+        return plat.acf.categorie.indexOf(this.categorieChoose, -1) 
+      })
       }
     },
-    methods: {
+  },
+  methods: {
+    onChange() {
+      this.isActive != this.isActive
+    },
+    incrementCounter() {
+      console.log('incrementCounter')
+      this.$store.commit('increment', 1)
+      this.value = this.$store.state.counter
+      this.$cookies.set('session', {
+        store: this.$store.state
+      }, {
+        path: this.$nuxt.context.base,
+        maxAge: this.$nuxt.context.env.maxAge
+      })
+    },
     setLikeCookie() {
       document.addEventListener('input', () => {
         setTimeout(() => {
-          app.$cookiz.set('like', JSON.stringify(this.liked)); 
+          this.$cookies.set('like', JSON.stringify(this.liked), {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7
+        });
         }, 300);
       })
     },
-    }
+  },
+  mounted: function(){
+    axios.get("https://api-template.theo-meyer.com/wp-json/wp/v2/plat").then(response =>
+    this.plats = response.data);
+    console.log(this.categorieChoose);
+      JSON.parse(this.$cookies.get('like')) == null ? this.liked = [] : this.liked = JSON.parse(this.$cookies.get('like'));
   }
+}
 </script>
 
 <style>
@@ -140,9 +243,11 @@ input{
   filter: brightness(125%);
 }
 
-.card-icons .like-container input {
-  display: none;
+.card-icons .like-container input, .choose-container .v-radio {
+  display: none !important;
 }
+
+
 
 .card-icons .like-container input:checked + label i {
   color: #fb2626;
@@ -162,4 +267,42 @@ input{
     transform: scale(1);
   }
 }
+
+.label_categorie{
+  margin-left:4rem;
+  cursor:pointer;
+}
+
+
+
+.contact-container p{
+  color: #30334F !important;
+}
+
+label img{
+  border: 1px #30334F solid;
+  padding:1rem;
+  border-radius:40px;
+}
+
+input:checked + label img{
+  background-color: #30334F;
+}
+
+p.phone::before{
+  content:'📱';
+}
+
+p.mail::before{
+  content:'📧';
+}
+
+p.location::before{
+  content:'🏘️';
+}
+
+.contact-container a{
+  text-decoration: none;
+}
+
 </style>
