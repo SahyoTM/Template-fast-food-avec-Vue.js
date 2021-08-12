@@ -2,6 +2,7 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
+
   head: {
     titleTemplate: '%s - dashboardResto',
     title: 'dashboardResto',
@@ -19,10 +20,11 @@ export default {
   css: [
   ],
 
-  loading:"@/components/Preloading.vue",
+  // loading:"@/components/Preloading.vue",
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/vuelidate',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -55,9 +57,9 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
-    'cookie-universal-nuxt',
     'cookie-universal-nuxt',
     [
       '@nuxtjs/firebase',
@@ -72,28 +74,20 @@ export default {
           measurementId: 'G-6VSW0C7P5H'
         },
         services: {
-          auth: true,
-          firestore: true,
-          functions: true,
-          storage: true,
-          database: true,
-          messaging: true,
-          performance: true,
-          analytics: true,
-          remoteConfig: true
+          auth:true,
         }
       }
     ]
   ],
 
+
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
+  firebase: {
+  },
   pwa: {
-    manifest: {
-      lang: 'en'
-    }
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
@@ -120,6 +114,5 @@ export default {
   },
 
   env: {
-    maxAge: 60 * 5,
   }
 }

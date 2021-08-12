@@ -1,29 +1,18 @@
 <template>
-<v-app id="default">
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-    >
-      <v-sheet
-        class="pa-4"
-      >
+  <v-app id="default">
+    <v-navigation-drawer v-model="drawer" app>
+<!--       <v-sheet class="pa-4">
         <div class='d-flex justify-center'>
-          <v-avatar
-            class="mb-4"
-            color="grey darken-1"
-            size="64"
-          ><img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="avatar"></v-avatar>
+          <v-avatar class="mb-4" color="grey darken-1" size="64"><img src="https://cdn.vuetifyjs.com/images/john.jpg"
+              alt="avatar"></v-avatar>
         </div>
 
         <div class="text-center text-uppercase title_user">Constantin</div>
-      </v-sheet>
+      </v-sheet> -->
 
 
       <v-list>
-        <v-list-item
-          v-for="(item, i) in menuItems" exact :key="i" :to="item.path"
-          link
-        >
+        <v-list-item v-for="(item, i) in menuItems" exact :key="i" :to="item.path" link>
 
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
@@ -35,16 +24,51 @@
         </v-list-item>
       </v-list>
       <div class='d-flex justify-center'>
-        <lottie  :height="400" :options="lottieOptions" @animCreated="handleAnimation" />
+        <lottie :height="400" :options="lottieOptions" @animCreated="handleAnimation" />
       </div>
     </v-navigation-drawer>
 
-    <v-main>
-      <v-container fluid>
+    <v-navigation-drawer v-if="user" v-model="drawer" app>
+<v-sheet class="pa-4">      
+        <div class='d-flex justify-center'>
+          <v-avatar class="mb-4" color="grey darken-1" size="64"><img src="https://cdn.vuetifyjs.com/images/john.jpg"
+              alt="avatar"></v-avatar>
+        </div>
 
-          <Nuxt />
-      </v-container>
-    </v-main>
+        <div class="text-center text-uppercase title_user">{{this.user.displayName}}</div>
+      </v-sheet> 
+
+
+      <v-list>
+        <v-list-item v-for="(item, i) in menuItemsConnected" exact :key="i" :to="item.path" link>
+
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click="signout" link exact class="signout">
+
+          <v-list-item-icon>
+            <v-icon>fa-user</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>Signout</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <div class='d-flex justify-center'>
+        <lottie :height="400" :options="lottieOptions" @animCreated="handleAnimation" />
+      </div>
+    </v-navigation-drawer>
+
+    <Nuxt />
+
   </v-app>
 </template>
 
@@ -63,17 +87,13 @@ import * as animationData from "@/assets/animation/food_delivery.json";
     name: 'homepage',
     data() {
       return {
+        user:'',
         drawer: true,
         menuItems: [{
             icon: 'fa-home',
             title: 'Home',
             path: '/'
           },
-/*           {
-            icon: 'fa-hamburger',
-            title: 'Menu',
-            path: '/'
-          }, */
           {
             icon: 'fa-heart',
             title: 'Likes',
@@ -84,11 +104,22 @@ import * as animationData from "@/assets/animation/food_delivery.json";
             title: 'Login',
             path: '/login'
           },
+        ],
+        menuItemsConnected: [{
+            icon: 'fa-home',
+            title: 'Home',
+            path: '/'
+          },
+          {
+            icon: 'fa-heart',
+            title: 'Likes',
+            path: '/wishlist'
+          },
           {
             icon: 'fa-cog',
             title: 'Settings',
             path: '/user_settings'
-          }
+          },
         ],
         anim: null, // for saving the reference to the animation
         lottieOptions: {
@@ -96,18 +127,34 @@ import * as animationData from "@/assets/animation/food_delivery.json";
         },
       }
     },
-    mounted: function() {
-      this.$nextTick(() => {
-        this.$nuxt.$loading.start()
-
-        setTimeout(() => this.$nuxt.$loading.finish(), 3000)
-      })
-    },
     methods: {
       handleAnimation: function (anim) {
         this.anim = anim;
       },
+
+      async signout(){
+        try {
+          await this.$fire.auth.signOut().then(result => {
+            console.log("result=", result)
+            this.user = '';
+            location.reload()
+            this.$router.push('/')
+          })
+        } catch (e) {
+          console.log(e)
+        }
+      }
     },
+    async mounted(){
+      try {
+          await this.$fire.auth.onAuthStateChanged(user => {
+            console.log("user =", user)
+            this.user = user;
+          })
+        } catch (e) {
+          console.log(e)
+        }
+    }
   }
 </script>
 <style>
@@ -159,26 +206,26 @@ import * as animationData from "@/assets/animation/food_delivery.json";
   transition: all 0.5s;
 }
 
-.v-sheet a:hover, .v-sheet a:active{
+.v-sheet a:hover, .v-sheet a:active, div.signout:hover{
   background-color: #F87193;
 
   transition: all 0.5s;
 
 }
 
-.v-sheet a{
+.v-sheet a, div.signout{
   background-color: #E4E7FE;
 
   transition: all 0.5s;
 
 }
 
-.v-sheet a:hover .v-list-item__content{
+.v-sheet a:hover .v-list-item__content, div.signout:hover .v-list-item__content{
   color:white !important;
   transition: all 0.5s;
 }
 
-.v-sheet a:hover .v-icon{
+.v-sheet a:hover .v-icon, div.signout:hover .v-icon{
   color:white !important;
   background-color:#EC6083 !important;
   transition: all 0.5s;

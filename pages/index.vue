@@ -1,109 +1,125 @@
 <template>
-  <v-app id="index">
-    <LikeBar />
-    <br>
-    <div class="container">
-      <v-row>
-        <div class="choose-container col-10">
-          <v-radio-group v-model="categorieChoose" row>
-            <div v-for="categorie in categories" :key="categorie" class="categorie-container">
-              <v-radio type="radio" name="radio" v-bind:id="categorie.name" v-bind:value="categorie.name"></v-radio>
-              <label v-bind:for="categorie.name" :value="categorie.name" class="label_categorie">
-                <img height="64px" :src="require(`@/assets/categorie/${categorie.name}.png`)" style="" />
-                <!-- <p>{{categorie.name}}</p> -->
-              </label>
-            </div>
-          </v-radio-group>
-        </div>
-        <div class="promo-container col-2">
-          <v-card class="mx-auto" max-width="344" outlined>
-            <v-list-item three-line>
+    <v-main>
+      <v-container fluid>
+        <v-app id="index">
+          <LikeBar />
+          <br>
+          <v-snackbar v-model="snackbar" :timeout="-1" shaped dark>
+            We use cookies to ensure you get the best experience on our website.
+
+            <template v-slot:action>
+              <v-btn color="pink" text @click="declineCookie()">
+                Decline
+              </v-btn>
+              <v-btn color="green" text @click="acceptCookie()">
+                Accept
+              </v-btn>
+            </template>
+
+          </v-snackbar>
+          <div class="container">
+            <div class="container-interne">
+              <v-row>
+                <div class="choose-container col-10">
+                  <v-radio-group v-model="categorieChoose" row>
+                    <div v-for="categorie in categories" :key="categorie" class="categorie-container">
+                      <v-radio type="radio" name="radio" v-bind:id="categorie.name" v-bind:value="categorie.name">
+                      </v-radio>
+                      <label v-bind:for="categorie.name" :value="categorie.name" class="label_categorie">
+                        <img height="64px" :src="require(`@/assets/categorie/${categorie.name}.png`)" style="" />
+                        <!-- <p>{{categorie.name}}</p> -->
+                      </label>
+                    </div>
+                  </v-radio-group>
+                </div>
+                <div class="promo-container col-2">
+                  <v-card class="mx-auto" max-width="344" outlined>
+                    <v-list-item three-line>
 
 
-              <img src="@/assets/promo.png" height="128px" alt="" class="mx-auto">
-            </v-list-item>
+                      <img src="@/assets/promo.png" height="128px" alt="" class="mx-auto">
+                    </v-list-item>
 
-            <v-card-actions class=" font-weight-bold" style="color:#30334F;">
-                - 50% sur tous nos burgers !
-            </v-card-actions>
-          </v-card>
-          
-        </div>
-      </v-row>
-      <h1 class="title_articles text-uppercase">{{ categorieChoose || 'null' }} <span
-          v-if="filteredPlats.length >= 1 && categorieChoose !='all'"
-          style="color:#30334F;font-size:1.5rem;font-weight:400;" class="text-uppercase">
-          {{filteredPlats.length}} Résultat<span v-if="filteredPlats.length >= 2">s</span></span></h1>
-      <!-- <input type="text" v-model="search" placeholder="🔎 Recherchez le plat que vous souhaitez">
+                    <v-card-actions class=" font-weight-bold" style="color:#30334F;">
+                      - 50% sur tous nos burgers !
+                    </v-card-actions>
+                  </v-card>
+
+                </div>
+              </v-row>
+              <h1 class="title_articles text-uppercase">{{ categorieChoose || 'null' }} <span
+                  v-if="filteredPlats.length >= 1 && categorieChoose !='all'"
+                  style="color:#30334F;font-size:1.5rem;font-weight:400;" class="text-uppercase">
+                  {{filteredPlats.length}} Résultat<span v-if="filteredPlats.length >= 2">s</span></span></h1>
+              <!-- <input type="text" v-model="search" placeholder="🔎 Recherchez le plat que vous souhaitez">
       <span v-if="search && filteredPlats.length >= 1" style="color:#30334F;font-size:1.5rem;font-weight:700;" class="text-uppercase">
         {{filteredPlats.length}} Résultat<span v-if="filteredPlats.length >= 2">s</span>
       </span> -->
-      <v-row no-gutters>
-        <div class="menu-container col-md-10">
-          <v-row>
-            <v-col v-for="plat in filteredPlats" :key="plat.post_name" col="6" md="4" max-height="300px">
-              <v-scroll-x-transition appear>
-                <v-card class="mx-auto" max-width="300px">
-                  <v-img class="white--text align-end" height="150px" :src="`${plat.acf.image.sizes.medium}`">
-                    <v-card-title>{{plat.post_title}} - {{plat.acf.prix}} €</v-card-title>
-                  </v-img>
+              <v-row no-gutters>
+                <div class="menu-container col-md-10">
+                  <v-row>
+                    <v-col v-for="plat in filteredPlats" :key="plat.post_name" col="6" md="4" max-height="300px">
+                      <v-scroll-x-transition appear>
+                        <v-card class="mx-auto" max-width="300px">
+                          <v-img class="white--text align-end" height="150px" :src="`${plat.acf.image.sizes.medium}`">
+                            <v-card-title>{{plat.post_title}} - {{plat.acf.prix}} €</v-card-title>
+                          </v-img>
 
-                  <v-card-text class="text--primary">
-                    <div class="card-icons">
-                      <div class="like-container">
-                        <input type="checkbox" name="checkbox" v-bind:id="plat.ID">
-                        <label v-bind:for="plat.ID" :value="plat.ID" v-model="liked" @click="setLikeCookie()">
-                          <v-icon>fa-heart</v-icon>
-                        </label>
-                      </div>
-                      <div class="add-to-cart">
-                        <button>
-                          <v-icon>fa-shopping-cart</v-icon>
-                        </button>
-                      </div>
+                          <v-card-text class="text--primary">
+                            <div class="card-icons">
+                              <div class="like-container">
+                                <input type="checkbox" name="checkbox" v-bind:id="plat.ID" :value="plat.ID"
+                                  v-model="liked" @click="setLikeCookie()">
+                                <label v-bind:for="plat.ID">
+                                  <v-icon>fa-heart</v-icon>
+                                </label>
+                              </div>
+                              <div class="add-to-cart">
+                                <button>
+                                  <v-icon>fa-shopping-cart</v-icon>
+                                </button>
+                              </div>
+                            </div>
+                          </v-card-text>
+                        </v-card>
+                      </v-scroll-x-transition>
+                    </v-col>
+                  </v-row>
+                </div>
+                <div class="feed-container col-md-2">
+                  <div class="contact-container">
+                    <div class="contact-container-title">
+                      <h1 class="text-uppercase" style="color:#30334F;">Contact</h1>
                     </div>
-                  </v-card-text>
-                </v-card>
-              </v-scroll-x-transition>
-            </v-col>
-          </v-row>
-        </div>
-        <div class="feed-container col-md-2">
-          <div class="contact-container">
-            <div class="contact-container-title">
-              <h1 class="text-uppercase" style="color:#30334F;">Contact</h1>
+                    <p class="">
+                      <v-icon>fa-phone</v-icon>065645464
+                    </p>
+                    <p class="">
+                      <v-icon>fa-envelope-open</v-icon>test@€st.com
+                    </p>
+                    <p class="">
+                      <v-icon>fa-home</v-icon>adresse
+                    </p>
+                    <a href="">
+                      <v-icon>fab fa-facebook</v-icon>
+                    </a>
+                    <a href="">
+                      <v-icon>fab fa-instagram</v-icon>
+                    </a>
+                  </div>
+                </div>
+              </v-row>
             </div>
-            <p class="">
-              <v-icon>fa-phone</v-icon>065645464
-            </p>
-            <p class="">
-              <v-icon>fa-envelope-open</v-icon>test@€st.com
-            </p>
-            <p class="">
-              <v-icon>fa-home</v-icon>adresse
-            </p>
-            <a href="">
-              <v-icon>fab fa-facebook</v-icon>
-            </a>
-            <a href="">
-              <v-icon>fab fa-instagram</v-icon>
-            </a>
           </div>
-        </div>
-      </v-row>
-
-      <!-- 
-      <div v-if="filteredPlats.length == []">
-        <p>Désolé</p>
-      </div> 
--->
-    </div>
-  </v-app>
+        </v-app>
+      </v-container>
+    </v-main>
 </template>
 
 <script>
+import '@fortawesome/fontawesome-free/css/all.css';
 import lottie from "vue-lottie/src/lottie.vue";
-import * as animationData from "@/assets/animation/choose_food.json";
+import * as animationData from "@/assets/animation/food_delivery.json";
 import axios from 'axios';
 
 export default {
@@ -114,9 +130,12 @@ export default {
         animationData: animationData.default
       },
       isActive: true,
+      snackbar: false,
+      cookieConsent: false,
       plats: [],
       search: '',
       liked: [],
+      notifications: '0',
       categorieChoose:'all',
       categories: [{
             icon: 'fa-home',
@@ -154,10 +173,25 @@ export default {
       })
       }
     },
+    getLikeCookie(){
+      const cookieValue= this.$cookies.get('like', { parseJSON: true });
+      cookieValue == null ? this.liked = [] : this.liked = cookieValue
+    }
   },
   methods: {
     onChange() {
       this.isActive != this.isActive
+    },
+    acceptCookie(){
+      this.snackbar = false
+      this.cookieConsent = true
+      this.$cookies.set('consentCookie', true, {
+          maxAge: 60 * 60 * 24 * 365
+      });
+    },
+    declineCookie(){
+      this.snackbar = false
+      this.cookieConsent = true
     },
     incrementCounter() {
       console.log('incrementCounter')
@@ -171,39 +205,51 @@ export default {
       })
     },
     setLikeCookie() {
-      document.addEventListener('input', () => {
-        setTimeout(() => {
-          this.$cookies.set('like', JSON.stringify(this.liked), {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7
-        });
-        }, 300);
-      })
-    },
+      if(this.$cookies.get('consentCookie') !== undefined){
+        // this.$cookies.set('notifications', this.notifications++, {maxAge: 60 * 60 * 24 * 365})
+        document.addEventListener('input', () => {
+          setTimeout(() => {
+            this.$cookies.set('like', JSON.stringify(this.liked), { maxAge: 60 * 60 * 24 * 365 })
+          }, 300);
+        })
+     }
+    }
   },
   mounted: function(){
     axios.get("https://api-template.theo-meyer.com/wp-json/wp/v2/plat").then(response =>
     this.plats = response.data);
     console.log(this.categorieChoose);
-      JSON.parse(this.$cookies.get('like')) == null ? this.liked = [] : this.liked = JSON.parse(this.$cookies.get('like'));
+    this.$nextTick(() => {
+        this.$nuxt.$loading.start()
+
+        setTimeout(() => this.$nuxt.$loading.finish(), 3000)
+      })
+    const consent = this.$cookies.get('consentCookie')
+    if(consent === undefined){
+      this.snackbar = true
+    }
+    this.getLikeCookie;
   }
 }
 </script>
 
 <style>
+.container-interne{
+  margin-left:2%;
+}
+
 .container{
   padding-top:3rem;
 }
 
 .title_articles{
   color:#30334F;
-  padding-left: 4rem;
+
   font-size:3rem;
 }
 
 input{
   color:#30334F;
-  margin-left: 4rem;
   font-size:1.5rem;
   width: 30rem;
   margin-bottom: 1rem;
@@ -269,7 +315,7 @@ input{
 }
 
 .label_categorie{
-  margin-left:4rem;
+  margin-right:4rem;
   cursor:pointer;
 }
 
@@ -304,5 +350,14 @@ p.location::before{
 .contact-container a{
   text-decoration: none;
 }
+
+.v-sheet.v-snack__wrapper{
+  background-color:black !important;
+  color:white !important;
+}
+
+/* NAV */
+
+
 
 </style>

@@ -23,9 +23,20 @@ import * as animationData from "@/assets/animation/loading_bruger.json";
         loading: false
         }
     },
+    mounted(){
+      const loader = this.$cookies.get('loading')
+      if(loader === undefined){
+        console.log("loader = ", loader)
+        finish()
+        console.log("loading = ", this.loading)
+    }
+    },
     methods: {
       start() {
         this.loading = true
+        this.$cookies.set('loading', 'played', {
+          maxAge: 60 * 60
+      });
       },
       finish() {
         this.loading = false
