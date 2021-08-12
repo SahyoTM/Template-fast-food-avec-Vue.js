@@ -1,4 +1,4 @@
-# dashboardResto
+# Template pour un fast-food
 
 ## Build Setup
 
